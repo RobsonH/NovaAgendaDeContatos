@@ -17,7 +17,7 @@ public class FormularioActivity extends AppCompatActivity {
     private TextInputEditText formularioNome;
     private TextInputEditText formularioEmail;
     private TextInputEditText formularioTelefone;
-
+    private Contato contato;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,17 +29,33 @@ public class FormularioActivity extends AppCompatActivity {
         formularioEmail = findViewById(R.id.formulario_email);
         formularioTelefone = findViewById(R.id.formulario_telefone);
 
+        Intent intent = getIntent();
+        if (intent.hasExtra("contato")){
+            contato = (Contato) intent.getSerializableExtra("contato");
+        }else {
+            contato = new Contato();
+        }
+        if (contato != null){
+            formularioNome.setText(contato.getNome());
+            formularioEmail.setText(contato.getEmail());
+            formularioTelefone.setText(contato.getTelefone());
+        }
+
         formularioBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Contato contato = new Contato();
+                //Contato contato = new Contato();
                 contato.setNome(formularioNome.getText().toString());
                 contato.setEmail(formularioEmail.getText().toString());
                 contato.setTelefone(formularioTelefone.getText().toString());
 
                 ContatoDAO contatoDAO = new ContatoDAO(FormularioActivity.this);
-                contatoDAO.inserir(contato);
+                if (contato.getId() != 0) {
+                    contatoDAO.alterar(contato);
+                }else {
+                    contatoDAO.inserir(contato);
+                }
                 contatoDAO.close();
                 Toast.makeText(FormularioActivity.this, "Contato Salvo com Sucesso", Toast.LENGTH_LONG).show();
 
